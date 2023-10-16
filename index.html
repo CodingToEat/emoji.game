@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Juego de Adivinanza de Combinaciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .emoji {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            font-size: 36px;
+            display: inline-block;
+        }
+
+        #game {
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        select {
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-size: 18px;
+        }
+
+        #pastCombinations {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Juego de Adivinanza de Combinaciones</h1>
+    <div id="game">
+        <h2>Intenta adivinar la combinación ganadora</h2>
+        <div>
+            <h3>Emojis disponibles:</h3>
+            <div class="emoji" id="emoji1">😀</div>
+            <div class="emoji" id="emoji2">😍</div>
+            <div class="emoji" id="emoji3">🤣</div>
+            <div class="emoji" id="emoji4">😎</div>
+            <div class="emoji" id="emoji5">🤔</div>
+            <div class="emoji" id="emoji6">🥳</div>
+            <div class="emoji" id="emoji7">👻</div>
+            <div class="emoji" id="emoji8">🎉</div>
+            <div class "emoji" id="emoji9">🤗</div>
+        </div>
+        <div>
+            <h3>Tu elección:</h3>
+            <select id="choice1" onchange="updateOptions(this);">
+                <option value="0"></option>
+                <option value="1">😀</option>
+                <option value="2">😍</option>
+                <option value="3">🤣</option>
+                <option value="4">😎</option>
+                <option value="5">🤔</option>
+                <option value="6">🥳</option>
+                <option value="7">👻</option>
+                <option value="8">🎉</option>
+                <option value="9">🤗</option>
+            </select>
+            <select id="choice2" onchange="updateOptions(this);">
+                <option value="0"></option>
+                <option value="1">😀</option>
+                <option value="2">😍</option>
+                <option value="3">🤣</option>
+                <option value="4">😎</option>
+                <option value="5">🤔</option>
+                <option value="6">🥳</option>
+                <option value="7">👻</option>
+                <option value="8">🎉</option>
+                <option value="9">🤗</option>
+            </select>
+            <select id="choice3" onchange="updateOptions(this);">
+                <option value="0"></option>
+                <option value="1">😀</option>
+                <option value="2">😍</option>
+                <option value="3">🤣</option>
+                <option value="4">😎</option>
+                <option value="5">🤔</option>
+                <option value="6">🥳</option>
+                <option value="7">👻</option>
+                <option value="8">🎉</option>
+                <option value="9">🤗</option>
+            </select>
+            <select id="choice4" onchange="updateOptions(this);">
+                <option value="0"></option>
+                <option value="1">😀</option>
+                <option value="2">😍</option>
+                <option value="3">🤣</option>
+                <option value="4">😎</option>
+                <option value="5">🤔</option>
+                <option value="6">🥳</option>
+                <option value="7">👻</option>
+                <option value="8">🎉</option>
+                <option value="9">🤗</option>
+            </select>
+        </div>
+        <button id="checkButton">Comprobar</button>
+        <p>Intentos: <span id="attempts">0</span></p>
+        <p>Aciertos: <span id="correct">0</span></p>
+        <p>Posiciones correctas: <span id="correctPositions">0</span></p>
+        <div id="pastCombinations">
+            <h3>Combinaciones anteriores:</h3>
+            <ul id="pastCombinationList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Array de emojis disponibles
+        const emojis = ['😀', '😍', '🤣', '😎', '🤔', '🥳', '👻', '🎉', '🤗'];
+
+        // Combinación ganadora generada al azar
+        let winningCombination = generateWinningCombination();
+
+        // Elementos del DOM
+        const choice1 = document.getElementById('choice1');
+        const choice2 = document.getElementById('choice2');
+        const choice3 = document.getElementById('choice3');
+        const choice4 = document.getElementById('choice4');
+        const checkButton = document.getElementById('checkButton');
+        const attempts = document.getElementById('attempts');
+        const correct = document.getElementById('correct');
+        const correctPositions = document.getElementById('correctPositions');
+        const pastCombinationList = document.getElementById("pastCombinationList");
+
+        let currentAttempts = 0;
+        let currentCorrect = 0;
+        let currentCorrectPositions = 0;
+
+        checkButton.addEventListener('click', () => {
+            currentAttempts++;
+
+            const userChoices = [
+                choice1.value,
+                choice2.value,
+                choice3.value,
+                choice4.value
+            ];
+
+            const emojisChoices = [
+                emojis[userChoices[0] - 1],
+                emojis[userChoices[1] - 1],
+                emojis[userChoices[2] - 1],
+                emojis[userChoices[3] - 1]
+            ];
+
+            // Comprobar aciertos y posiciones correctas
+            currentCorrect = countCorrect(userChoices, winningCombination);
+            currentCorrectPositions = countCorrectPositions(userChoices, winningCombination);
+
+            attempts.textContent = currentAttempts;
+            correct.textContent = currentCorrect;
+            correctPositions.textContent = currentCorrectPositions;
+
+            // Comprobar si el jugador adivinó la combinación ganadora
+
+            resetSelects();
+
+            if (currentCorrectPositions === 4) {
+                alert('¡Felicidades! Adivinaste la combinación ganadora.');
+                resetGame();
+            } else if (currentAttempts >= 10) {
+                alert('¡Se agotaron tus intentos! La combinación ganadora era: ' + winningCombination.join(''));
+                resetGame();
+            } else {
+                const pastCombinationItem = document.createElement("li");
+                pastCombinationItem.textContent = `${attempts.textContent}: ${emojisChoices.join(' ')} - Aciertos: ${correct.textContent}, Posiciones correctas: ${correctPositions.textContent}`;
+                pastCombinationList.appendChild(pastCombinationItem);
+            }
+
+
+        });
+
+        function generateWinningCombination() {
+            const combination = [];
+            while (combination.length < 4) {
+                const randomIndex = Math.floor(Math.random() * emojis.length);
+                const randomEmoji = emojis[randomIndex];
+                if (!combination.includes(randomEmoji)) {
+                    combination.push(randomEmoji);
+                }
+            }
+            return combination;
+        }
+
+        function countCorrect(userChoices, winningCombination) {
+            let correct = 0;
+            for (let i = 0; i < 4; i++) {
+                if (winningCombination.includes(emojis[userChoices[i] - 1])) {
+                    correct++;
+                }
+            }
+            return correct;
+        }
+
+        function countCorrectPositions(userChoices, winningCombination) {
+            let correctPositions = 0;
+            for (let i = 0; i < 4; i++) {
+                if (userChoices[i] == emojis.indexOf(winningCombination[i]) + 1) {
+                    correctPositions++;
+                }
+            }
+            return correctPositions;
+        }
+
+        function resetSelects() {
+            choice1.value = 0;
+            choice2.value = 0;
+            choice3.value = 0;
+            choice4.value = 0;
+            updateOptions();
+        }
+
+        function resetGame() {
+            currentAttempts = 0;
+            currentCorrect = 0;
+            currentCorrectPositions = 0;
+            attempts.textContent = 0;
+            correct.textContent = 0;
+            correctPositions.textContent = 0;
+            pastCombinationList.innerHTML = "";
+            winningCombination = generateWinningCombination();
+        }
+
+        function updateOptions() {
+            const selectedOptions = document.querySelectorAll('select option:checked');
+            const selectedEmojis = Array.from(selectedOptions).map(option => option.value);
+
+            const allSelects = document.querySelectorAll('select');
+            allSelects.forEach((sel) => {
+                sel.querySelectorAll('option').forEach((opt) => {
+                    opt.disabled = false;
+                });
+            });
+
+            allSelects.forEach((sel) => {
+                selectedEmojis.forEach((emoji) => {
+                    sel.querySelector(`option[value="${emoji}"]`).disabled = true;
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
